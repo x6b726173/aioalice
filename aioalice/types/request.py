@@ -27,7 +27,7 @@ class Request(AliceObject):
             raise ValueError(f'Request type must be "SimpleUtterance" or "ButtonPressed", not "{value}"')
 
     def __attrs_post_init__(self):
-        if self.markup is not None:
+        if (self.markup is not None) and (len(self.markup) != 0):
             self.markup = Markup(**self.markup)
 
 
