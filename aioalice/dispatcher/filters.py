@@ -7,7 +7,7 @@ from ..utils.helper import Helper, HelperMode, Item
 log = logging.getLogger(__name__)
 
 
-async def check_filter(filter_, args):
+async def check_filter(filter_, *args):
     """
     Helper for executing filter
 
@@ -25,7 +25,7 @@ async def check_filter(filter_, args):
         return filter_(*args)
 
 
-async def check_filters(filters, args):
+async def check_filters(filters, *args):
     """
     Check list of filters
 
@@ -35,7 +35,7 @@ async def check_filters(filters, args):
     """
     if filters is not None:
         for f in filters:
-            filter_result = await check_filter(f, args)
+            filter_result = await check_filter(f, *args)
             if not filter_result:
                 return False
     return True
@@ -82,7 +82,7 @@ class StartsWithFilter(StringCompareFilter):
     Check if command starts with one of these lines
     """
 
-    async def check(self, areq):
+    async def check(self, areq, *args):
         command = areq.request.command.lower()
         return any([command.startswith(line) for line in self.lines])
 
@@ -92,7 +92,7 @@ class ContainsFilter(StringCompareFilter):
     Check if command contains one of these lines
     """
 
-    async def check(self, areq):
+    async def check(self, areq, *args):
         command = areq.request.command.lower()
         return any([line in command for line in self.lines])
 
@@ -106,7 +106,7 @@ class CommandsFilter(AsyncFilter):
     def __init__(self, commands):
         self.commands = commands
 
-    async def check(self, areq):
+    async def check(self, areq, *args):
         command = areq.request.command.lower()
         return command in self.commands
 
@@ -118,7 +118,7 @@ class StateFilter(AsyncFilter):
         self.dispatcher = dispatcher
         self.state = state
 
-    async def check(self, areq):
+    async def check(self, areq, *args):
         if self.state == '*':
             return True
         user_state = await self.dispatcher.storage.get_state(areq.session.user_id)
@@ -128,7 +128,7 @@ class StateFilter(AsyncFilter):
 class StatesListFilter(StateFilter):
     """Check if user's state is in list of states"""
 
-    async def check(self, areq):
+    async def check(self, areq, *args):
         user_state = await self.dispatcher.storage.get_state(areq.session.user_id)
         return user_state in self.state
 
@@ -142,7 +142,7 @@ class RegexpFilter(Filter):
     def __init__(self, regexp):
         self.regexp = re.compile(regexp, flags=re.IGNORECASE | re.MULTILINE)
 
-    def check(self, areq):
+    def check(self, areq, *args):
         return bool(self.regexp.search(areq.request.original_utterance))
 
 
@@ -157,7 +157,7 @@ class RequestTypeFilter(Filter):
             content_types = [content_types]
         self.content_types = content_types
 
-    def check(self, areq):
+    def check(self, areq, *args):
         return areq.request.type in self.content_types
 
 

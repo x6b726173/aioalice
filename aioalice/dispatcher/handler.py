@@ -53,7 +53,7 @@ class Handler:
         """
 
         for filters, handler in self.handlers:
-            if await check_filters(filters, args):
+            if await check_filters(filters, *args):
                 try:
                     return await handler(*args)
                 except SkipHandler:
