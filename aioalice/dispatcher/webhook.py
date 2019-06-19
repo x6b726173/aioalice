@@ -4,6 +4,7 @@ import functools
 from aiohttp import web
 from ..utils import json, generate_json_payload
 from ..types import AliceRequest, AliceResponse, Response
+from aiohttp_cors import CorsViewMixin
 
 
 log = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ DEFAULT_ERROR_RESPONSE_TEXT = 'Server error. Developer has to check logs.'
 RESPONSE_TIMEOUT = 1.2
 
 
-class WebhookRequestHandler(web.View):
+class WebhookRequestHandler(web.View, CorsViewMixin):
     """
     Simple Wehhook request handler for aiohttp web server.
 
